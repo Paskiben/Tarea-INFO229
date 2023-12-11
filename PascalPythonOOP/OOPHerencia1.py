@@ -10,6 +10,6 @@ class pikachu(pokemon):
     def ataque(self, tipoataque):
         return f"{self.nombre} tipo de ataque: {tipoataque}"
 
-nuevo_pokemon = pikachu("boby", "electrico")
+nuevo_pokemon = pikachu("pokachu", "electrico")
 print(nuevo_pokemon.description())
-print(nuevo_pokemon.ataque("Impact thunder"))
+print(nuevo_pokemon.ataque("Thundershock"))
