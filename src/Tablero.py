@@ -6,7 +6,16 @@ from Configuracion import *
 class Tablero:
     def __init__(self, configuracion) -> None:
         self.mapa = [Celda(0) for i in range(configuracion.width*configuracion.height)]
-    #Generar minas y sumar valor en celdas adiacentes
+minesNum = 0
+while(minesNum<configuracion.mines)
+    minePosx = random()%configuracion .width
+    minePosy = random()%configuracion.hight
+    if(Tablero.mapa[minePosx*configuracion.width+minePosy].value !=-1)
+        Tablero.mapa[minePosx*configuracion.width+minePosy].value=-1
+        minesNum+=1
+        for i in rage(minePosx*width-1, minePosx*width+2)
+            for j in range(minePosy-1, minePosy+2)
+                if (Tablero.mapa[i+j].valor!=-1) Celda+=1
 
 
 setEnv()
