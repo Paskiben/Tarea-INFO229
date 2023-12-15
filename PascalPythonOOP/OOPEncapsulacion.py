@@ -61,8 +61,8 @@ class Empleado:
                     fdel= __delApellido,
                     doc = "soy la propiedad del apellido")
     
-    def __add__(self, other):
-        return self.salario + other.salario
+    # def __add__(self, other):
+    #     return self.salario + other.salario
 
 emp1 = Empleado("Victor","Torres", 3000)
 emp2 = Empleado("Sarina","Sarosa", 7000)
