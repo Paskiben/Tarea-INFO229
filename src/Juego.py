@@ -33,7 +33,7 @@ class Juego:
                     fset= __setConf,
                     doc = "propiedades configuracion")
     tablero = property(fget= __getTablero,
-                       fset= __setTablero,
+                    fset= __setTablero,
                     doc = "propiedades tablero")
     time = property(fget= __getTime,
                     fset= __setTime,
