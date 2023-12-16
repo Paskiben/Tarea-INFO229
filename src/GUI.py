@@ -142,15 +142,16 @@ class GUI:
                 index = columna*self.game.conf.height + fila
 
                 
-                if (self.game.tablero.mapa[index].descubierta):
+                
+                if (self.game.tablero.mapa[index].marca):
+                    self.ventana.blit(bandera, (x,y))
+                elif (self.game.tablero.mapa[index].descubierta):
                     if self.game.tablero.mapa[index].valor == -1:
                         self.ventana.blit(bomba, (x,y))
                     elif self.game.tablero.mapa[index].valor != 0:
                         icono_imagen = pygame.image.load(self.dataPath+str(self.game.tablero.mapa[index].valor)+'.png')
                         icono_imagen = pygame.transform.scale(icono_imagen, (self.ancho_celda, self.alto_celda))
                         self.ventana.blit(icono_imagen , (x,y))
-                elif (self.game.tablero.mapa[index].marca):
-                    self.ventana.blit(bandera, (x,y))
                 else:
                     self.ventana.blit(casilla_no_revelada, (x,y))
 GUI()
