@@ -92,7 +92,7 @@ class GUI:
                                         if (rectangulo.collidepoint(evento.pos) and (not self.game.tablero.mapa[columna*self.game.conf.height+fila].descubierta)):
                                             self.game.tablero.mapa[columna*self.game.conf.height + fila].marcar      
                                     
-                frame_actual = int(pygame.time.get_ticks() * frame_rate / 1000) % len(frames)
+            frame_actual = int(pygame.time.get_ticks() * frame_rate / 1000) % len(frames)
 
             self.ventana.blit(frames[frame_actual], (0,0))
             self.ventana.blit(barra_lateral, (0,0))
@@ -141,15 +141,16 @@ class GUI:
                 y = fila * self.alto_celda + 110
                 index = columna*self.game.conf.height + fila
 
-                if (self.game.tablero.mapa[index].marca):
-                    self.ventana.blit(bandera, (x,y))
-                elif (self.game.tablero.mapa[index].descubierta):
+                
+                if (self.game.tablero.mapa[index].descubierta):
                     if self.game.tablero.mapa[index].valor == -1:
                         self.ventana.blit(bomba, (x,y))
                     elif self.game.tablero.mapa[index].valor != 0:
                         icono_imagen = pygame.image.load(self.dataPath+str(self.game.tablero.mapa[index].valor)+'.png')
                         icono_imagen = pygame.transform.scale(icono_imagen, (self.ancho_celda, self.alto_celda))
                         self.ventana.blit(icono_imagen , (x,y))
+                elif (self.game.tablero.mapa[index].marca):
+                    self.ventana.blit(bandera, (x,y))
                 else:
                     self.ventana.blit(casilla_no_revelada, (x,y))
 GUI()
