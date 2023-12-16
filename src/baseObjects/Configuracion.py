@@ -7,12 +7,29 @@ class Configuracion:
         return cls._instance
 
     def __init__(self, width, height, mines):
-        self.__width = width if(width>=5) else 5
-        self.__height = height if(height>=5) else 5
-        self.__mines = mines if(mines>=1) else 1
-        self.__width = width if(width<=25) else 25
-        self.__height = height if(height<=25) else 25
-        self.__mines = mines if(mines<=25*25-1) else 25*25-1
+        if (width>=5):
+            if (width<=25):
+                self.__width = width 
+            else:
+                self.__width = 25 
+        else:
+            self.__width= 5
+
+        if (height>=5):
+            if (height<=25):
+                self.__height = height 
+            else:
+                self.__height = 25 
+        else:
+            self.__height= 5
+
+        if (mines >=1):
+            if(mines <= self.__width*self.__height-1):
+                self.__mines = mines
+            else:
+                self.__mines = self.__width*self.__height-1
+        else:
+            self.__mines = 1
 
     #getters
     def __getWidth(self):
@@ -31,7 +48,7 @@ class Configuracion:
         self.__height = height if(height<=25) else 25
     def __setMines(self, mines):
         self.__mines = mines if(mines>=1) else 1
-        self.__mines = mines if(mines<=25*25-1) else 25*25-1
+        self.__mines = mines if(mines<=self.width*self.height-1) else self.width*self.height-1
 
     #propertys (patron decorator)
     width = property(fget= __getWidth,
