@@ -1,7 +1,8 @@
-from os import environ
 from random import shuffle
-from Celda import *
-from Configuracion import *
+from baseObjects.Celda import *
+from baseObjects.Configuracion import *
+
+#Hacer arreglo con bombas
 
 class Tablero:
     def __init__(self, configuracion):
@@ -31,9 +32,9 @@ class Tablero:
         shuffle(pos)
         for i in range(0, conf.mines):
             x,y = pos.pop()
-            index = x*conf.height+y
+            index = x*conf.height + y
             if(self.mapa[index].valor !=-1):
                 self.mapa[index].valor=-1
-                for i in range(x-1, x+2):
-                    for j in range(y-1, y+2):
-                        if ((i>=0 & j>=0 & i<conf.width & j<conf.height) & self.mapa[i+j].valor!=-1): self.mapa[i+j].valor+=1
+                for j in range(x-1, x+2):
+                    for k in range(y-1, y+2):
+                        if ((j>=0 and k>=0 and j<conf.width and k<conf.height) and self.mapa[(j*conf.height)+k].valor!=-1): self.mapa[(j*conf.height)+k].valor+=1

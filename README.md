@@ -4,5 +4,4 @@ Tarea final arquitectura en software.
 
 patrones de diseño:
 -singleton
--fachada
 -decorator

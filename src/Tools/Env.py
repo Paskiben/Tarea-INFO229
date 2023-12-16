@@ -2,7 +2,7 @@ from os import environ
 def setEnv():
     var=[]
     try:
-        file = open('./.env', 'r')
+        file = open('.env', 'r')
     except(FileNotFoundError):
         print("Error al abrir .env!")
         return
@@ -19,13 +19,16 @@ def checkEnv():
         pass
     try:
         if (environ.get('WIDTH') == None):
-            print('La variable de entorno WIDTH no fue definida') 
+            print('La variable de entorno WIDTH no fue definida')
             raise VarNotDefined
         if (environ.get('HEIGHT') == None):
             print('La variable de entorno WIDTH no fue definida')
             raise VarNotDefined
         if (environ.get('MINES') == None):
             print('La variable de entorno WIDTH no fue definida')
+            raise VarNotDefined
+        if (environ.get('PATH_DATA')== None):
+            print('La variable de entorno PATH_DATA no fue definida')
             raise VarNotDefined
         else:
             print("Variables de entorno cargadas correctamente")
