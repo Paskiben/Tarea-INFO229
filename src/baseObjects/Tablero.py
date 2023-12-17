@@ -7,7 +7,7 @@ class Tablero:
         if(isinstance(configuracion, Configuracion)):
             self.__mapa = [Celda(0) for i in range(configuracion.width*configuracion.height)]
             self.__mines =[]
-            self.putMines(configuracion)
+            self.__putMines(configuracion)
         else:
             print("El objeto entregado para configurar no es de clase configuracion")
 
@@ -24,7 +24,8 @@ class Tablero:
             self.__mapa = [Celda(0) for i in range(config.width*config.height)]
             self.putMines(config)
     def __setMines(self, index):
-        self.mines.append(index)
+        if(isinstance(index, int)):
+            self.mines.append(index)
 
     #propertys (patron decorator)
     mapa = property(fget= __getMapa,
@@ -34,7 +35,7 @@ class Tablero:
                     fset=__setMines,
                     doc= "propiedades mines")
 
-    def putMines(self, conf):
+    def __putMines(self, conf):
         pos = [(x,y) for x in range(conf.width) for y in range(conf.height)]
         shuffle(pos)
         for i in range(0, conf.mines):

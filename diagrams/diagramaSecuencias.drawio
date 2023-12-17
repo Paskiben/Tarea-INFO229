@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e">
     <diagram id="eQZ0HtDIxcoLxn4Rt9oI" name="Page-1">
-        <mxGraphModel dx="1130" dy="347" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1090" dy="-161" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -37,8 +37,8 @@
                 <mxCell id="25" value="&lt;span style=&quot;text-align: left;&quot;&gt;Tablero(Configuracion)&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
                     <mxGeometry x="690" y="650" width="140" height="30" as="geometry"/>
                 </mxCell>
-                <mxCell id="27" value="&lt;span style=&quot;text-align: left;&quot;&gt;muestrraJuego(Juego)&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
-                    <mxGeometry x="280" y="600" width="140" height="30" as="geometry"/>
+                <mxCell id="27" value="&lt;span style=&quot;text-align: left;&quot;&gt;GUI( )&lt;br&gt;&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="320" y="600" width="60" height="30" as="geometry"/>
                 </mxCell>
                 <mxCell id="29" value="&lt;span style=&quot;text-align: left;&quot;&gt;iniciarJuego(Configuracion)&lt;/span&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
                     <mxGeometry x="470" y="620" width="170" height="30" as="geometry"/>

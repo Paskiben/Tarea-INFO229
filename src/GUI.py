@@ -1,18 +1,21 @@
 import pygame
+import pygame_gui
 from moviepy.editor import VideoFileClip
-from random import randint
 from Game.Juego import *
-from math import sqrt
+
 
 class GUI:
     blanco = (254, 174, 126)
     negro = (254, 126, 185)
     gris = (2, 200, 200)
 
+    slider_value = 2
+    font = pygame.font.Font(None, 36)
+
     def __init__(self):
         self.game = Juego()
+        pygame.mixer.init()
         self.dataPath = environ.get('PATH_DATA')
-        self.vivo=True
         factor= max(self.game.conf.width, self.game.conf.height)
         self.ancho_celda = 500/factor
         self.alto_celda = 500/factor
@@ -22,6 +25,21 @@ class GUI:
         win_height = int(environ.get('WINDOW_HEIGHT'))
         self.ventana = pygame.display.set_mode((win_width, win_height))
         pygame.display.set_caption("Buscaminas")
+
+        self.lose_sound = pygame.mixer.Sound(self.dataPath+"sounds/lose_sound.wav")
+        self.lose_sound.set_volume(0.5)
+        self.won_sound = pygame.mixer.Sound(self.dataPath+"sounds/won_sound.wav")
+        self.won_sound.set_volume(0.3)
+        reveal_sound = pygame.mixer.Sound(self.dataPath+"sounds/reveal_sound.wav")
+        reveal_sound.set_volume(0.5)
+        difficulty_change_sound = pygame.mixer.Sound(self.dataPath+"sounds/difficulty_change_sound.wav")
+        difficulty_change_sound.set_volume(0.5)
+        flag_sound = pygame.mixer.Sound(self.dataPath+"sounds/flag_sound.wav") 
+        flag_sound.set_volume(0.5)
+        button_sound = pygame.mixer.Sound(self.dataPath+"sounds/button_sound.wav")
+        button_sound.set_volume(0.5)
+
+        manager = pygame_gui.UIManager((win_width, win_height), self.dataPath+'theme.json')
 
         ruta_icono = self.dataPath+"cutebomb.png"
         icono = pygame.image.load(ruta_icono)
@@ -52,60 +70,264 @@ class GUI:
         rectangulo_boton_exit = imagen_boton_exit.get_rect()
         rectangulo_boton_exit.center = (win_width-40, 40)
 
+        imagen_boton_return = pygame.image.load(self.dataPath+"return.png")
+        imagen_boton_return = pygame.transform.scale(imagen_boton_return, (60,60))
+
+        rectangulo_boton_return = imagen_boton_return.get_rect()
+        rectangulo_boton_return.center = (40, 40)
+
         imagen_boton_config = pygame.image.load(self.dataPath+"config.png")
         imagen_boton_config = pygame.transform.scale(imagen_boton_config, (60, 60))  # Ajustar el tamaño según sea necesario
         # Definir el rectángulo del botón de reinicio
         rectangulo_boton_config = imagen_boton_config.get_rect()
         rectangulo_boton_config.center = (40, 40)
 
+        dif_1 = pygame.image.load(self.dataPath+"easy.png")
+        dif_2 = pygame.image.load(self.dataPath+"normal.png")
+        dif_3 = pygame.image.load(self.dataPath+"expert.png")
+
+        imagen_boton_custom = pygame.image.load(self.dataPath+"custom_button.png")
+        rectangulo_boton_custom = imagen_boton_custom.get_rect()
+        rectangulo_boton_custom.center = (320,499)
+
+        imagen_boton_okey = pygame.image.load(self.dataPath+"okey_button.png")
+        rectangulo_boton_okey = imagen_boton_okey.get_rect()
+        rectangulo_boton_okey.center = (320,667)
+
+        imagen_star = pygame.image.load("data/star.png")
+        imagen_won_star = pygame.image.load(self.dataPath+"win_star.png")
+        imagen_lose_star = pygame.image.load(self.dataPath+"lose_star.png")
+
+        cuadro_alto = pygame_gui.elements.UITextEntryLine(
+            relative_rect=pygame.Rect((150, 550), (100, 40)), 
+            manager=manager, 
+            placeholder_text="Alto",
+            object_id="custom_text_entry",
+        )
+
+        cuadro_ancho = pygame_gui.elements.UITextEntryLine(
+            relative_rect=pygame.Rect((270, 550), (100, 40)), 
+            manager=manager, placeholder_text="Ancho",
+        )
+
+        cuadro_bombas = pygame_gui.elements.UITextEntryLine(
+            relative_rect=pygame.Rect((390, 550), (100, 40)), 
+            manager=manager, placeholder_text="N° bombas",
+        )
+
+        cuadro_ancho.set_allowed_characters('numbers')
+        cuadro_alto.set_allowed_characters('numbers')
+        cuadro_bombas.set_allowed_characters('numbers')
+
         frame_rate = clip.fps
+
+        cursor_rect = pygame.Rect(0,0,50,50)
+
+        ingame = True
+        inconfig = False
+
+        custom_visible = False
+
+        font = pygame.font.Font(None, 56)
+
+        start_time = pygame.time.get_ticks()
 
         clock = pygame.time.Clock()
         
         while True:
-            for evento in pygame.event.get():
-                if (evento.type == pygame.QUIT):
-                    pygame.quit()
-                    exit()
-                elif evento.type == pygame.MOUSEBUTTONDOWN:
-                    # Verificar si el jugador hizo clic en alguna celda
+            while ingame:
+                for evento in pygame.event.get():
+                    if (evento.type == pygame.QUIT):
+                        pygame.quit()
+                        exit()
+                    elif evento.type == pygame.MOUSEBUTTONDOWN:
+                        # Verificar si el jugador hizo clic en alguna celda
                         if(evento.button == 1):
                             if rectangulo_boton_reinicio.collidepoint(evento.pos):
+                                pygame.mixer.Sound.play(button_sound)
                                 self.game.iniciarJuego(self.game.conf)
-                                self.vivo=True
+                                self.game.vivo=True
+                                start_time = pygame.time.get_ticks()
                             elif rectangulo_boton_exit.collidepoint(evento.pos):
+                                pygame.mixer.Sound.play(button_sound)
                                 pygame.quit()
                                 exit()
-                                
+                            elif rectangulo_boton_config.collidepoint(evento.pos):
+                                pygame.mixer.Sound.play(button_sound)
+                                inconfig = True
+                                ingame = False
+                                paused_time = pygame.time.get_ticks() - start_time
                             for fila in range(self.game.conf.height):
                                 for columna in range(self.game.conf.width):
                                     rectangulo = pygame.Rect(columna * self.ancho_celda + 70, fila * self.alto_celda + 110, self.ancho_celda, self.alto_celda)
-                                    if(self.vivo):
+                                    if(self.game.vivo):
                                         if (rectangulo.collidepoint(evento.pos) and (not self.game.tablero.mapa[columna*self.game.conf.height+fila].marca)):
+                                            pygame.mixer.Sound.play(reveal_sound)
                                             self.revelar_celda(fila, columna)
                                     
                         elif(evento.button == 3):
                             for fila in range(self.game.conf.height):
                                 for columna in range(self.game.conf.width):
                                     rectangulo = pygame.Rect(columna * self.ancho_celda + 70, fila * self.alto_celda + 110, self.ancho_celda, self.alto_celda)
-                                    if(self.vivo):
+                                    if(self.game.vivo):
                                         if (rectangulo.collidepoint(evento.pos) and (not self.game.tablero.mapa[columna*self.game.conf.height+fila].descubierta)):
-                                            self.game.tablero.mapa[columna*self.game.conf.height + fila].marcar      
-                                    
-            frame_actual = int(pygame.time.get_ticks() * frame_rate / 1000) % len(frames)
+                                            pygame.mixer.Sound.play(flag_sound)
+                                            if(self.game.tablero.mapa[columna*self.game.conf.height + fila].marca):
+                                                self.game.tablero.mapa[columna*self.game.conf.height + fila].marcar 
+                                                self.game.marcadas -= 1
+                                            elif(self.game.conf.mines - self.game.marcadas > 0):
+                                                self.game.tablero.mapa[columna*self.game.conf.height + fila].marcar  
+                                                self.game.marcadas += 1     
 
-            self.ventana.blit(frames[frame_actual], (0,0))
-            self.ventana.blit(barra_lateral, (0,0))
-            self.ventana.blit(icon_bar, (0,0))
-            self.ventana.blit(imagen_boton_reinicio, rectangulo_boton_reinicio)
-            self.ventana.blit(imagen_boton_exit, rectangulo_boton_exit)
-            self.ventana.blit(imagen_boton_config, rectangulo_boton_config)
+                #Condicion de victoria
+                if (self.game.reveladas == self.game.conf.height * self.game.conf.width - self.game.conf.mines):
+                            self.game.win = True
+                            self.game.vivo = False
+                if (self.game.vivo):
+                    time = pygame.time.get_ticks()
+                formatted_time = "{:02}:{:02}".format(
+                     (time-start_time) // 60000,  (time-start_time) % 60000 //1000
+                )
+                
+                    
+                
+                
+                frame_actual = int(pygame.time.get_ticks() * frame_rate / 1000) % len(frames)
 
-            self.dibujar_tablero()
 
-            pygame.display.flip()
+                self.ventana.blit(frames[frame_actual], (0,0))
+                self.ventana.blit(barra_lateral, (0,0))
+                self.ventana.blit(icon_bar, (0,0))
+                self.ventana.blit(imagen_boton_reinicio, rectangulo_boton_reinicio)
+                self.ventana.blit(imagen_boton_exit, rectangulo_boton_exit)
+                self.ventana.blit(imagen_boton_config, rectangulo_boton_config)
 
-            clock.tick_busy_loop(60)
+                bombs_ammount = font.render((str(self.game.conf.mines - self.game.marcadas)), True, (254,126,185))
+                self.ventana.blit(bombs_ammount, (560,654))
+
+                if(not self.game.win and self.game.vivo):
+                    self.ventana.blit(imagen_star, (275, 625))
+                elif(self.game.win and not self.game.vivo):
+                    
+                    self.ventana.blit(imagen_won_star, (275, 625))
+                elif(not self.game.win and not self.game.vivo):
+                    
+                    self.ventana.blit(imagen_lose_star, (275, 625))
+
+                self.dibujar_tablero()
+
+                text = font.render(formatted_time, True, (254, 126, 185))
+            
+                self.ventana.blit(text, (115, 654)) 
+
+                pygame.display.flip()
+
+                clock.tick_busy_loop(60)
+            
+            while inconfig:
+                for event in pygame.event.get():
+                    if (event.type == pygame.QUIT):
+                        pygame.quit()
+                        exit()
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                        if(event.button == 1):
+                            if(rectangulo_boton_return.collidepoint(event.pos)):
+                                inconfig = False
+                                ingame = True
+                                start_time = pygame.time.get_ticks() - paused_time
+                                pygame.mixer.Sound.play(button_sound)
+                            elif(rectangulo_boton_exit.collidepoint(event.pos)):
+                                pygame.mixer.Sound.play(button_sound)
+                                pygame.quit()
+                                exit()
+                            elif(rectangulo_boton_custom.collidepoint(event.pos)):
+                                pygame.mixer.Sound.play(button_sound)
+                                custom_visible = not custom_visible
+                                cuadro_alto.visible = custom_visible
+                                cuadro_ancho.visible = custom_visible
+                                cuadro_bombas.visible = custom_visible
+                            elif(rectangulo_boton_okey.collidepoint(event.pos)):
+                                pygame.mixer.Sound.play(button_sound)
+                                if(custom_visible):
+                                    alto = int(cuadro_alto.get_text()) if (cuadro_alto.get_text() !=  '') else 5
+                                    ancho = int(cuadro_ancho.get_text()) if (cuadro_ancho.get_text() !=  '') else 5
+                                    bombas = int(cuadro_bombas.get_text()) if (cuadro_bombas.get_text() !=  '') else 1
+                                    print("Texto ingresado:", alto, ", ", ancho, ", ", bombas)
+                                else:
+                                    if(self.slider_value == 1):
+                                        alto, ancho, bombas = (10, 10, 10)
+                                    elif(self.slider_value == 2):
+                                        alto, ancho , bombas = (18, 18, 40)
+                                    elif(self.slider_value == 3):
+                                        alto, ancho, bombas = (24, 24, 99)
+                                self.game.iniciarJuego(Configuracion(int(alto),int(ancho),int(bombas)))
+                                factor= max(self.game.conf.width, self.game.conf.height)
+                                self.ancho_celda = 500/factor
+                                self.alto_celda = 500/factor
+                                inconfig = False
+                                ingame = True
+                                start_time = pygame.time.get_ticks()
+                            x, y = event.pos
+                            self.slider_value
+                            if(65 <= x <= 193 and 195 <= y <= 317):
+                                pygame.mixer.Sound.play(difficulty_change_sound)
+                                self.slider_value = 1
+                            elif(193 <= x <= 448 and 195 <= y <= 317):
+                                pygame.mixer.Sound.play(difficulty_change_sound)
+                                self.slider_value = 2
+                            elif(448 <= x <= 575 and 195 <= y <= 317):
+                                pygame.mixer.Sound.play(difficulty_change_sound)
+                                self.slider_value = 3   
+                    manager.process_events(event)
+                
+                frame_actual = int(pygame.time.get_ticks() * frame_rate / 1000) % len(frames)
+
+                self.ventana.blit(frames[frame_actual], (0,0))
+
+                self.ventana.blit(barra_lateral, (0,0))
+                self.ventana.blit(imagen_boton_custom, rectangulo_boton_custom)
+                self.ventana.blit(imagen_boton_okey, rectangulo_boton_okey)
+                self.ventana.blit(imagen_boton_exit, rectangulo_boton_exit)
+                self.ventana.blit(imagen_boton_return, rectangulo_boton_return)
+                
+                if custom_visible:
+                    manager.update(1 / 60.0)
+                    manager.draw_ui(self.ventana)
+
+                if(self.slider_value == 1):
+                    self.ventana.blit(dif_1, (68,186))
+                elif(self.slider_value == 2):
+                    self.ventana.blit(dif_2, (284, 186))
+                elif(self.slider_value == 3):
+                    self.ventana.blit(dif_3, (492, 180))
+
+                self.draw_slider(self.slider_value, cursor_rect)
+                pygame.display.flip()
+                
+                clock.tick_busy_loop(60)         
+
+    def draw_slider(self, slider_value, cursor_rect):
+        # Cargar imágenes de la barra y el indicador
+        barra = pygame.image.load(self.dataPath+"level_bar.png")
+        indicador = pygame.image.load(self.dataPath+"cursor_bar.png")
+
+        # Tamaño de la barra y el indicador
+
+        # Posición de la barra
+        self.ventana.blit(barra, (0,0))
+
+        # Posición del indicador basada en el valor del slider
+        # Ajusta el valor del slider a la posición del indicador
+        indicador_x = 280
+        if(slider_value == 1):
+            indicador_x = 64
+        elif(slider_value == 2):
+            indicador_x = 280
+        elif(slider_value == 3):
+            indicador_x = 496
+        indicador_y = 248
+
+        self.ventana.blit(indicador, (indicador_x, indicador_y))
 
 
     # Función para revelar celda
@@ -117,15 +339,21 @@ class GUI:
             for i in self.game.tablero.mines:
                 self.game.tablero.mapa[i].descubrir
             self.dibujar_tablero()
-            self.vivo = False
-            #Terminar esta cosa uwu
+            self.game.vivo = False
+            pygame.mixer.Sound.play(self.lose_sound)
         elif (self.game.tablero.mapa[index].valor == 0 and (not self.game.tablero.mapa[index].descubierta)):
+            self.game.reveladas +=1
             self.game.tablero.mapa[index].descubrir
             for i in range(columna-1, columna+2):
                 for j in range(fila-1, fila+2):
                     if ((i>=0 and j>=0 and i<self.game.conf.width and j<self.game.conf.height) and (self.game.tablero.mapa[i*self.game.conf.height+j].valor>0 or (i==columna or j==fila))): self.revelar_celda(j,i)
-        else:
+            if (self.game.reveladas == self.game.conf.height * self.game.conf.width - self.game.conf.mines):
+                pygame.mixer.Sound.play(self.won_sound)
+        elif (not self.game.tablero.mapa[index].descubierta):
             self.game.tablero.mapa[index].descubrir
+            self.game.reveladas +=1 
+            if (self.game.reveladas == self.game.conf.height * self.game.conf.width - self.game.conf.mines):
+                pygame.mixer.Sound.play(self.won_sound)
 
     # Función para dibujar el tablero en la pantall1a
     def dibujar_tablero(self):
