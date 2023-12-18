@@ -3,6 +3,21 @@ import pygame_gui
 from moviepy.editor import VideoFileClip
 from Game.Juego import *
 
+#-------------------------------------------------------------------------------#
+
+#                              COMENTARIOS
+#         |) image_x = pygame.image.load(ruta_imagen) -> cargar imagen
+#         |) image_x = pygame.transform.scale(image_x, (w,h)) -> rescalar imagen
+#         |) rectangulo_image_x -> crear rectangulo que luego servira como boton sobre la imagen.
+#         |) frames -> cargar gif con ayuda de la biblioteca VideoFileClip de moviepy.
+#         |) pygame.mixer.init(), esto se usara para el Sound, reproduce sonidos importados con pygame.mixer.Sound(ruta_sonido).
+#         |) manager -> usa un json para estilos y este manejara mas adelante gracias al UITextEntryLine, las cajas de texto en la ventana config.
+#         |) En el while True se manejan otros dos sub-whiles para cambiar entre pantalla de juego a pantalla de configuracion.
+#         |) La funcion draws_lider() se encarga de dibujar y controlar el slider que se ve en la pantalla de configuracion.
+#         |) La funcion dibujar_tablero() se encarga de dibujar el tablero de juego y actualizarlo constantemente.
+
+#--------------------------------------------------------------------------------#
+
 
 class GUI:
     blanco = (254, 174, 126)
@@ -50,22 +65,6 @@ class GUI:
 
         frames = [pygame.transform.scale(pygame.image.fromstring(frame.tostring(), clip.size, "RGB"), (win_width, win_height)) for frame in clip.iter_frames()]
 
-        #--------------------------------------------------
-#-----------------------------
-
-#PARA SELARENE                              COMENTARIOS G
-        #image_x = pygame.image.load(ruta_imagen) -> cargar imagen
-        #image_x = pygame.transform.scale(image_x, (w,h)) -> rescalar imagen
-        #rectangulo_image_x -> crear rectangulo que luego servira como boton sobre la imagen.
-        #frames -> cargar gif con ayuda de la biblioteca VideoFileClip de moviepy.
-        #pygame.mixer.init(), esto se usara para el Sound, reproduce sonidos importados con pygame.mixer.Sound(ruta_sonido).
-        #manager -> usa un json para estilos y este manejara mas adelante gracias al UITextEntryLine, las cajas de texto en la ventana config.
-        #En el while True se manejan otros dos sub-whiles para cambiar entre pantalla de juego a pantalla de configuracion.
-        #La funcion draws_lider() se encarga de dibujar y controlar el slider que se ve en la pantalla de configuracion.
-        #La funcion dibujar_tablero() se encarga de dibujar el tablero de juego y actualizarlo constantemente.
-
-        #--------------------------------------------------------------------------------#
-
         ruta_barra_lateral = self.dataPath+"barra.png"
         barra_lateral = pygame.image.load(ruta_barra_lateral)
         barra_lateral = pygame.transform.scale(barra_lateral, (win_width,win_height))
@@ -94,7 +93,7 @@ class GUI:
 
         imagen_boton_config = pygame.image.load(self.dataPath+"config.png")
         imagen_boton_config = pygame.transform.scale(imagen_boton_config, (60, 60))  
-       
+    
         rectangulo_boton_config = imagen_boton_config.get_rect()
         rectangulo_boton_config.center = (40, 40)
 
@@ -179,7 +178,8 @@ class GUI:
                                     if(self.game.vivo):
                                         if (rectangulo.collidepoint(evento.pos) and (not self.game.tablero.mapa[columna*self.game.conf.height+fila].marca)):
                                             pygame.mixer.Sound.play(reveal_sound)
-                                            self.revelar_celda(fila, columna)
+                                            self.game.revelar_celda(fila, columna)
+                                            self.reaccion()
                                     
                         elif(evento.button == 3):
                             for fila in range(self.game.conf.height):
@@ -196,20 +196,13 @@ class GUI:
                                                 self.game.marcadas += 1     
 
                 #Condicion de victoria
-                if (self.game.reveladas == self.game.conf.height * self.game.conf.width - self.game.conf.mines):
-                            self.game.win = True
-                            self.game.vivo = False
                 if (self.game.vivo):
                     time = pygame.time.get_ticks()
                 formatted_time = "{:02}:{:02}".format(
                      (time-start_time) // 60000,  (time-start_time) % 60000 //1000
                 )
-                
-                    
-                
-                
-                frame_actual = int(pygame.time.get_ticks() * frame_rate / 1000) % len(frames)
 
+                frame_actual = int(pygame.time.get_ticks() * frame_rate / 1000) % len(frames)
 
                 self.ventana.blit(frames[frame_actual], (0,0))
                 self.ventana.blit(barra_lateral, (0,0))
@@ -341,15 +334,11 @@ class GUI:
 
 
 
-    def reaccion(self, fila, columna):
-        index = columna*self.game.conf.height + fila
-        if (not self.game.tablero.mapa[index].marca):
-            if (self.game.tablero.mapa[index].valor == -1 and (not self.game.tablero.mapa[index].descubierta)):
-                pygame.mixer.Sound.play(self.lose_sound)
-                if (self.game.reveladas == self.game.conf.height * self.game.conf.width - self.game.conf.mines):
-                    pygame.mixer.Sound.play(self.won_sound)
-            elif (not self.game.tablero.mapa[index].descubierta):
-                if (self.game.reveladas == self.game.conf.height * self.game.conf.width - self.game.conf.mines):
+    def reaccion(self):
+        if (not self.game.win and not self.game.vivo):
+            self.dibujar_tablero()
+            pygame.mixer.Sound.play(self.lose_sound)
+        elif (self.game.win):
                     pygame.mixer.Sound.play(self.won_sound)
 
     def dibujar_tablero(self):

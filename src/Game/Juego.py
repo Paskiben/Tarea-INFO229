@@ -82,9 +82,11 @@ class Juego:
                     for j in range(fila-1, fila+2):
                         if ((i>=0 and j>=0 and i<self.conf.width and j<self.conf.height) and (self.tablero.mapa[i*self.conf.height+j].valor>0 or (i==columna or j==fila))): self.revelar_celda(j,i)
                 if (self.reveladas == self.conf.height * self.conf.width - self.conf.mines):
-                    self.won = True
+                    self.win = True
+                    self.vivo= False
             elif (not self.tablero.mapa[index].descubierta):
                 self.tablero.mapa[index].descubrir
                 self.reveladas +=1 
                 if (self.reveladas == self.conf.height * self.conf.width - self.conf.mines):
-                    self.won = True
+                    self.win = True
+                    self.vivo = False
