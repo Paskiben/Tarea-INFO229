@@ -195,7 +195,6 @@ class GUI:
                                                 self.game.tablero.mapa[columna*self.game.conf.height + fila].marcar  
                                                 self.game.marcadas += 1     
 
-                #Condicion de victoria
                 if (self.game.vivo):
                     time = pygame.time.get_ticks()
                 formatted_time = "{:02}:{:02}".format(
