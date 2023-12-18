@@ -334,26 +334,27 @@ class GUI:
     def revelar_celda(self, fila, columna):
         # Marcar la celda como revelada
         index = columna*self.game.conf.height + fila
-        if (self.game.tablero.mapa[index].valor == -1 and (not self.game.tablero.mapa[index].descubierta)):
-            self.game.tablero.mapa[index].descubrir
-            for i in self.game.tablero.mines:
-                self.game.tablero.mapa[i].descubrir
-            self.dibujar_tablero()
-            self.game.vivo = False
-            pygame.mixer.Sound.play(self.lose_sound)
-        elif (self.game.tablero.mapa[index].valor == 0 and (not self.game.tablero.mapa[index].descubierta)):
-            self.game.reveladas +=1
-            self.game.tablero.mapa[index].descubrir
-            for i in range(columna-1, columna+2):
-                for j in range(fila-1, fila+2):
-                    if ((i>=0 and j>=0 and i<self.game.conf.width and j<self.game.conf.height) and (self.game.tablero.mapa[i*self.game.conf.height+j].valor>0 or (i==columna or j==fila))): self.revelar_celda(j,i)
-            if (self.game.reveladas == self.game.conf.height * self.game.conf.width - self.game.conf.mines):
-                pygame.mixer.Sound.play(self.won_sound)
-        elif (not self.game.tablero.mapa[index].descubierta):
-            self.game.tablero.mapa[index].descubrir
-            self.game.reveladas +=1 
-            if (self.game.reveladas == self.game.conf.height * self.game.conf.width - self.game.conf.mines):
-                pygame.mixer.Sound.play(self.won_sound)
+        if (not self.game.tablero.mapa[index].marca):
+            if (self.game.tablero.mapa[index].valor == -1 and (not self.game.tablero.mapa[index].descubierta)):
+                self.game.tablero.mapa[index].descubrir
+                for i in self.game.tablero.mines:
+                    self.game.tablero.mapa[i].descubrir
+                self.dibujar_tablero()
+                self.game.vivo = False
+                pygame.mixer.Sound.play(self.lose_sound)
+            elif (self.game.tablero.mapa[index].valor == 0 and (not self.game.tablero.mapa[index].descubierta)):
+                self.game.reveladas +=1
+                self.game.tablero.mapa[index].descubrir
+                for i in range(columna-1, columna+2):
+                    for j in range(fila-1, fila+2):
+                        if ((i>=0 and j>=0 and i<self.game.conf.width and j<self.game.conf.height) and (self.game.tablero.mapa[i*self.game.conf.height+j].valor>0 or (i==columna or j==fila))): self.revelar_celda(j,i)
+                if (self.game.reveladas == self.game.conf.height * self.game.conf.width - self.game.conf.mines):
+                    pygame.mixer.Sound.play(self.won_sound)
+            elif (not self.game.tablero.mapa[index].descubierta):
+                self.game.tablero.mapa[index].descubrir
+                self.game.reveladas +=1 
+                if (self.game.reveladas == self.game.conf.height * self.game.conf.width - self.game.conf.mines):
+                    pygame.mixer.Sound.play(self.won_sound)
 
     # Función para dibujar el tablero en la pantall1a
     def dibujar_tablero(self):
