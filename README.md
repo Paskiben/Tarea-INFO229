@@ -13,7 +13,7 @@ La configuración base está presente en el archivo .env, el programa está visu
 al modificarlas.
 
 Ejecucion:
-    Ejecutar objeto GUI
+    Ejecutar objeto GUI desde la carpeta raiz, es decir, fuera de la carpeta source. en ubuntu sería: "python3 'src/GUI.py'"
 
 Tutorial:
     Puede usar Click izquierdo para revelar una celda.
