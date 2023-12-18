@@ -50,6 +50,22 @@ class GUI:
 
         frames = [pygame.transform.scale(pygame.image.fromstring(frame.tostring(), clip.size, "RGB"), (win_width, win_height)) for frame in clip.iter_frames()]
 
+        #--------------------------------------------------
+#-----------------------------
+
+#PARA SELARENE                              COMENTARIOS G
+        #image_x = pygame.image.load(ruta_imagen) -> cargar imagen
+        #image_x = pygame.transform.scale(image_x, (w,h)) -> rescalar imagen
+        #rectangulo_image_x -> crear rectangulo que luego servira como boton sobre la imagen.
+        #frames -> cargar gif con ayuda de la biblioteca VideoFileClip de moviepy.
+        #pygame.mixer.init(), esto se usara para el Sound, reproduce sonidos importados con pygame.mixer.Sound(ruta_sonido).
+        #manager -> usa un json para estilos y este manejara mas adelante gracias al UITextEntryLine, las cajas de texto en la ventana config.
+        #En el while True se manejan otros dos sub-whiles para cambiar entre pantalla de juego a pantalla de configuracion.
+        #La funcion draws_lider() se encarga de dibujar y controlar el slider que se ve en la pantalla de configuracion.
+        #La funcion dibujar_tablero() se encarga de dibujar el tablero de juego y actualizarlo constantemente.
+
+        #--------------------------------------------------------------------------------#
+
         ruta_barra_lateral = self.dataPath+"barra.png"
         barra_lateral = pygame.image.load(ruta_barra_lateral)
         barra_lateral = pygame.transform.scale(barra_lateral, (win_width,win_height))
@@ -59,14 +75,14 @@ class GUI:
         icon_bar = pygame.transform.scale(icon_bar, (win_width, win_height))
 
         imagen_boton_reinicio = pygame.image.load(self.dataPath+"reload.png")
-        imagen_boton_reinicio = pygame.transform.scale(imagen_boton_reinicio, (60, 60))  # Ajustar el tamaño según sea necesario
-        # Definir el rectángulo del botón de reinicio
+        imagen_boton_reinicio = pygame.transform.scale(imagen_boton_reinicio, (60, 60))  
+    
         rectangulo_boton_reinicio = imagen_boton_reinicio.get_rect()
         rectangulo_boton_reinicio.center = (win_width // 2, 40)
 
         imagen_boton_exit = pygame.image.load(self.dataPath+"exit.png")
-        imagen_boton_exit = pygame.transform.scale(imagen_boton_exit, (60, 60))  # Ajustar el tamaño según sea necesario
-        # Definir el rectángulo del botón de reinicio
+        imagen_boton_exit = pygame.transform.scale(imagen_boton_exit, (60, 60))  
+        
         rectangulo_boton_exit = imagen_boton_exit.get_rect()
         rectangulo_boton_exit.center = (win_width-40, 40)
 
@@ -77,8 +93,8 @@ class GUI:
         rectangulo_boton_return.center = (40, 40)
 
         imagen_boton_config = pygame.image.load(self.dataPath+"config.png")
-        imagen_boton_config = pygame.transform.scale(imagen_boton_config, (60, 60))  # Ajustar el tamaño según sea necesario
-        # Definir el rectángulo del botón de reinicio
+        imagen_boton_config = pygame.transform.scale(imagen_boton_config, (60, 60))  
+       
         rectangulo_boton_config = imagen_boton_config.get_rect()
         rectangulo_boton_config.center = (40, 40)
 
@@ -141,7 +157,7 @@ class GUI:
                         pygame.quit()
                         exit()
                     elif evento.type == pygame.MOUSEBUTTONDOWN:
-                        # Verificar si el jugador hizo clic en alguna celda
+                        
                         if(evento.button == 1):
                             if rectangulo_boton_reinicio.collidepoint(evento.pos):
                                 pygame.mixer.Sound.play(button_sound)
@@ -252,7 +268,6 @@ class GUI:
                                     alto = int(cuadro_alto.get_text()) if (cuadro_alto.get_text() !=  '') else 5
                                     ancho = int(cuadro_ancho.get_text()) if (cuadro_ancho.get_text() !=  '') else 5
                                     bombas = int(cuadro_bombas.get_text()) if (cuadro_bombas.get_text() !=  '') else 1
-                                    print("Texto ingresado:", alto, ", ", ancho, ", ", bombas)
                                 else:
                                     if(self.slider_value == 1):
                                         alto, ancho, bombas = (10, 10, 10)
@@ -307,17 +322,12 @@ class GUI:
                 clock.tick_busy_loop(60)         
 
     def draw_slider(self, slider_value, cursor_rect):
-        # Cargar imágenes de la barra y el indicador
+        
         barra = pygame.image.load(self.dataPath+"level_bar.png")
         indicador = pygame.image.load(self.dataPath+"cursor_bar.png")
 
-        # Tamaño de la barra y el indicador
-
-        # Posición de la barra
         self.ventana.blit(barra, (0,0))
 
-        # Posición del indicador basada en el valor del slider
-        # Ajusta el valor del slider a la posición del indicador
         indicador_x = 280
         if(slider_value == 1):
             indicador_x = 64
@@ -330,33 +340,18 @@ class GUI:
         self.ventana.blit(indicador, (indicador_x, indicador_y))
 
 
-    # Función para revelar celda
-    def revelar_celda(self, fila, columna):
-        # Marcar la celda como revelada
+
+    def reaccion(self, fila, columna):
         index = columna*self.game.conf.height + fila
         if (not self.game.tablero.mapa[index].marca):
             if (self.game.tablero.mapa[index].valor == -1 and (not self.game.tablero.mapa[index].descubierta)):
-                self.game.tablero.mapa[index].descubrir
-                for i in self.game.tablero.mines:
-                    self.game.tablero.mapa[i].descubrir
-                self.dibujar_tablero()
-                self.game.vivo = False
                 pygame.mixer.Sound.play(self.lose_sound)
-            elif (self.game.tablero.mapa[index].valor == 0 and (not self.game.tablero.mapa[index].descubierta)):
-                self.game.reveladas +=1
-                self.game.tablero.mapa[index].descubrir
-                for i in range(columna-1, columna+2):
-                    for j in range(fila-1, fila+2):
-                        if ((i>=0 and j>=0 and i<self.game.conf.width and j<self.game.conf.height) and (self.game.tablero.mapa[i*self.game.conf.height+j].valor>0 or (i==columna or j==fila))): self.revelar_celda(j,i)
                 if (self.game.reveladas == self.game.conf.height * self.game.conf.width - self.game.conf.mines):
                     pygame.mixer.Sound.play(self.won_sound)
             elif (not self.game.tablero.mapa[index].descubierta):
-                self.game.tablero.mapa[index].descubrir
-                self.game.reveladas +=1 
                 if (self.game.reveladas == self.game.conf.height * self.game.conf.width - self.game.conf.mines):
                     pygame.mixer.Sound.play(self.won_sound)
 
-    # Función para dibujar el tablero en la pantall1a
     def dibujar_tablero(self):
         bomba = pygame.image.load(self.dataPath+"bomba.png")
         bomba = pygame.transform.scale(bomba, (self.ancho_celda, self.alto_celda))

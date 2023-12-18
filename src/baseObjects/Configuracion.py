@@ -1,6 +1,7 @@
 class Configuracion:
     _instance = None
-    #constructor
+    
+    #Constructor
     def __new__(cls, *args, **kwargs):
         if (not cls._instance):
             cls._instance = super(Configuracion, cls).__new__(cls)
@@ -31,7 +32,7 @@ class Configuracion:
         else:
             self.__mines = 1
 
-    #getters
+    #Getters
     def __getWidth(self):
         return self.__width
     def __getHeight(self):
@@ -39,7 +40,7 @@ class Configuracion:
     def __getMines(self):
         return self.__mines
     
-    #setters
+    #Setters
     def __setWidth(self, width):
         self.__width = width if(width>=5) else 5
         self.__width = width if(width<=25) else 25
@@ -50,7 +51,7 @@ class Configuracion:
         self.__mines = mines if(mines>=1) else 1
         self.__mines = mines if(mines<=self.width*self.height-1) else self.width*self.height-1
 
-    #propertys (patron decorator)
+    #Propertys (patron decorator)
     width = property(fget= __getWidth,
                     fset= __setWidth,
                     doc = "propiedades width")
@@ -60,7 +61,8 @@ class Configuracion:
     mines = property(fget= __getMines,
                     fset= __setMines,
                     doc = "propiedades width")
-    
+    #Metodos
+    #Forma de setear las tres varaibles al mismo tiempo
     @property
     def actualConfig(self):
         return f"Ancho = {self.width} Largo = {self.height} numero de minas = {self.mines}"
